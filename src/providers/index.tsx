@@ -1,5 +1,5 @@
 import { useReducer, type Dispatch, type ReactNode } from "react";
-import type { createStore } from "../utils";
+import type { createStore } from "../utils/index";
 import { createContext } from "react";
 
 /* --- [StoreContext] --- */
@@ -22,10 +22,12 @@ export const StoreProvider = ({ children, store }: { children: ReactNode; store:
    const [state, baseDispatch] = useReducer(store.reducers, store.initialState);
 
    const dispatch = [thunkMiddleware, ...(store.middlewares as any)] // apply middlewares
-      .reduceRight((next, mw) =>mw({
+      .reduceRight(
+         (next, mw) =>
+            mw({
                dispatch: next,
                getState: () => state,
-        })(next),
+            })(next),
          baseDispatch
       );
    // @ts-ignore

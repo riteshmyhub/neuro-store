@@ -1,3 +1,23 @@
+/** [----createStore----]
+ * @example
+ * // basic middleware example
+ *  const middleware = ({ dispatch, getState }: any) => (next: any) =>(action: any) => {
+ *      if (typeof action === "function") {
+ *            return action(dispatch, getState);
+ *      }
+ *     return next(action);
+ *   };
+ *  @example
+ * // basic store
+ * const store = createStore({
+ *   reducers: {
+ *     auth: authSlice.reducer,
+ *     counter: counterSlice.reducer
+ *   },
+ *   middlewares: [middleware]
+ * });
+ *
+ */
 function createStore<R, M>(store: { reducers: R; middlewares: M }) {
    function rootReducer<State>(reducers: any) {
       return (state: any, action: any) => {
