@@ -9,16 +9,24 @@
  *   };
  *  @example
  * // basic store
- * const store = createStore({
- *   reducers: {
- *     auth: authSlice.reducer,
- *     counter: counterSlice.reducer
- *   },
- *   middlewares: [middleware]
- * });
+ *   const reducers = {
+      auth: authSlice.reducer,
+   };
+
+   type Reducers = typeof reducers;
+   type State = {
+      [K in keyof Reducers]: ReturnType<Reducers[K]>;
+   };
+   type Middleware = [];
+
+   const store = createStore<State, Reducers, Middleware>({
+      reducers: reducers,
+      middlewares: [],
+   });
  *
  */
-function createStore<R, M>(store: { reducers: R; middlewares: M }) {
+
+function createStore<S, R, M>(store: { reducers: R; middlewares: M }) {
    function rootReducer<State>(reducers: any) {
       return (state: any, action: any) => {
          const nextState = {} as any;
@@ -34,7 +42,7 @@ function createStore<R, M>(store: { reducers: R; middlewares: M }) {
       initialState[key] = (store.reducers as any)[key].initialState;
    }
    return {
-      initialState,
+      initialState: initialState as S,
       reducers: rootReducer(store.reducers),
       middlewares: store.middlewares,
    };
