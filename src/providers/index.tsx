@@ -31,6 +31,7 @@ export const StoreProvider = ({ children, store }: { children: ReactNode; store:
          baseDispatch
       );
    return (
+      // @ts-ignore
       <StoreContext.Provider value={{ state, dispatch }}>
          {children}
       </StoreContext.Provider>
