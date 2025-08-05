@@ -1,9 +1,10 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./app/App";
+import { StoreProvider } from "state-box";
+import store from "./app/store";
 
 createRoot(document.getElementById("root")!).render(
-   <StrictMode>
+   <StoreProvider store={store}>
       <App />
-   </StrictMode>
+   </StoreProvider>
 );

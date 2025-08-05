@@ -1,5 +1,5 @@
-import HttpClient from "@/libs/interceptors";
 import { asyncThunk, createSlice } from "state-box";
+import HttpClient from "../../interceptors";
 
 const initialState = {
    login: {
