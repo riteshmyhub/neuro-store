@@ -30,12 +30,9 @@ export const StoreProvider = ({ children, store }: { children: ReactNode; store:
             })(next),
          baseDispatch
       );
-   // @ts-ignore
    return (
       <StoreContext.Provider value={{ state, dispatch }}>
-         {/*  */}
          {children}
-         {/*  */}
       </StoreContext.Provider>
    );
 };

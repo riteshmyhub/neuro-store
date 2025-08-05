@@ -1,13 +1,18 @@
-import { defineConfig } from "rollup";
 import typescript from "@rollup/plugin-typescript";
+import { defineConfig } from "rollup";
 
 export default defineConfig({
    input: "src/index.ts",
-   output: {
-      dir: "dist",
-      format: "es",
-      name: "use-hooks-zone",
-   },
-   external: ["react", "react-dom"],
-   plugins: [typescript({ tsconfig: "tsconfig.json" })],
+   output: [
+      {
+         file: "dist/index.cjs.js",
+         format: "cjs",
+      },
+      {
+         file: "dist/index.esm.js",
+         format: "es",
+      },
+   ],
+   plugins: [typescript({ tsconfig: "./tsconfig.json" })],
+   external: ["react", "react-dom"], // if needed
 });
