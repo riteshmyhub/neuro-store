@@ -1,6 +1,5 @@
 import HttpClient from "@/libs/interceptors";
-import { asyncThunk } from "@/libs/state-manager";
-import { produce } from "immer";
+import { asyncThunk, createSlice } from "@/libs/state-manager/utils";
 
 const initialState = {
    login: {
@@ -34,15 +33,13 @@ class AuthService extends HttpClient {
       },
    };
 
-   slice = {
+   slice = createSlice({
+      name: "AuthService",
       initialState: initialState,
-      reducer: Object.assign(
-         produce((state: typeof initialState, action: any) => {
-            this.login.reducer(state, action);
-         }),
-         { initialState }
-      ),
-   };
+      reducer: (...params) => {
+         this.login.reducer(...params);
+      },
+   });
 }
 
 export const authService = new AuthService();

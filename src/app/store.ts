@@ -1,5 +1,6 @@
-import { createStore, useSelector } from "@/libs/state-manager";
+import { useSelector } from "@/libs/state-manager/hooks";
 import { authSlice } from "./auth/auth.service";
+import { createStore } from "@/libs/state-manager/utils";
 
 type Reducer = { auth: typeof authSlice.reducer };
 type Middleware = [];

@@ -1,11 +1,10 @@
-import { useDispatch } from "@/libs/state-manager";
 import { authService } from "./auth.service";
 import { useAppSelector } from "../store";
+import { useDispatch } from "@/libs/state-manager/hooks";
 
 export default function Login() {
    const { login } = useAppSelector((state) => state.auth);
    const dispatch = useDispatch();
-
    const onLogin = () => {
       dispatch(authService.login.api({ email: "john@mail.com", password: "changeme" }));
    };
