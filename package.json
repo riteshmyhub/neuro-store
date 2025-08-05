@@ -1,15 +1,15 @@
 {
-   "name": "state-box",
+   "name": "neuro-store",
    "version": "1.0.0",
-   "description": "state-box",
+   "description": "neuro-store",
    "main": "dist/index.js",
    "module": "dist/index.es.js",
    "types": "dist/index.d.ts",
    "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1",
       "build": "npx rollup -c",
-      "dev": "npm run build && npm link && cd ../example && npm link state-box && npm run dev",
-      "clean": "rmdir /s /q dist && npm unlink state-box && cd ../example && npm unlink state-box"
+      "dev": "npm run build && npm link && cd ../example && npm link neuro-store && npm run dev",
+      "clean": "rmdir /s /q dist && npm unlink neuro-store && cd ../example && npm unlink neuro-store"
    },
    "keywords": [
       "react",
