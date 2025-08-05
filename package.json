@@ -8,8 +8,8 @@
    "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1",
       "build": "npx rollup -c",
-      "pkg": "npm run build && npm link && cd ./example && npm link state-box && npm run dev",
-      "clean": "rmdir /s /q dist && npm unlink state-box && cd ./example && npm unlink state-box"
+      "dev": "npm run build && npm link && cd ../example && npm link state-box && npm run dev",
+      "clean": "rmdir /s /q dist && npm unlink state-box && cd ../example && npm unlink state-box"
    },
    "keywords": [
       "react",
