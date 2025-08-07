@@ -147,15 +147,7 @@ function Product() {
    useEffect(() => {
       dispatch(fetchProducts.api());
    }, [dispatch, fetchProducts]);
-
-   if (fetchProducts.isLoading) {
-      return <div>Loading products...</div>;
-   }
-
-   if (fetchProducts.data?.length === 0) {
-      return <div>No products available</div>;
-   }
-
+   
    return (
       <div>
          {fetchProducts.data?.map((product, idx) => (
@@ -177,8 +169,12 @@ function Cart() {
    return (
       <div>
          <p>Count: {cart.quantity}</p>
-         <button onClick={() => dispatch({ type: "increment" })}>Increment</button>
-         <button onClick={() => dispatch({ type: "decrement" })}>Decrement</button>
+         <button onClick={() => dispatch({ type: "increment" })}>
+            Increment
+         </button>
+         <button onClick={() => dispatch({ type: "decrement" })}>
+            Decrement
+         </button>
       </div>
    );
 }

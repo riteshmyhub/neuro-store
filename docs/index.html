@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>neuro-store Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .markdown-body pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            overflow-x: auto;
+        }
+        .markdown-body code {
+            background-color: #e2e8f0;
+            padding: 0.2em 0.4em;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+        .markdown-body pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="container mx-auto p-6">
+        <div class="bg-white shadow-lg rounded-lg p-8 markdown-body">
+            <h1 class="text-4xl font-bold mb-6 text-center">neuro-store</h1>
+            <p class="text-lg mb-6"><code>neuro-store</code> is a lightweight, Redux-inspired state management library for React applications. It provides a simple and intuitive API for creating and managing application state, with built-in support for asynchronous actions and middleware.</p>
+
+            <h2 class="text-3xl font-semibold mb-4">Installation</h2>
+            <pre><code class="language-bash">npm install neuro-store</code></pre>
+
+            <h2 class="text-3xl font-semibold mb-4">Core Concepts</h2>
+            <p class="text-lg mb-4"><code>neuro-store</code> is built around three core concepts:</p>
+            <ul class="list-disc list-inside mb-6 text-lg">
+                <li><strong>Slice:</strong> A modular way to organize your state and reducers.</li>
+                <li><strong>Store:</strong> The single source of truth for your application's state.</li>
+                <li><strong>Actions:</strong> Plain JavaScript objects that describe state changes.</li>
+            </ul>
+
+            <h2 class="text-3xl font-semibold mb-4">Usage</h2>
+
+            <h3 class="text-2xl font-semibold mb-3">1. Create a Reducer sync & async</h3>
+            <p class="text-lg mb-4">A slice is a collection of a reducer function, a name, and an initial state value.</p>
+            <pre><code class="language-typescript">// product/product.slice.ts
+import { asyncThunk, createSlice } from "neuro-store";
+
+const initialState = {
+   fetchProducts: {
+      data: [] as any[],
+      isLoading: true,
+   },
+   cart: {
+      quantity: 0,
+   },
+};
+
+//sync reducer
+const cartReducer = (state, action) => {
+   if (action.type === "increment") {
+      state.value += 1;
+   }
+   if (action.type === "decrement") {
+      state.value -= 1;
+   }
+};
+
+//async reducer
+const fetchProducts = {
+   api: asyncThunk("fetchProducts", async (_) => {
+      const response = await fetch(`/api/products`);
+      return response.json();
+   }),
+   reducer(state, action) {
+      if (action.paylaod === fetchUser.pending) {
+         state.fetchProducts.isLoading = true;
+      }
+      if (action.paylaod === fetchUser.fulfilled) {
+         state.fetchProducts.isLoading = false;
+         state.fetchProducts.data = action.payload;
+      }
+      if (action.paylaod === fetchUser.rejected) {
+         state.fetchProducts.isLoading = false;
+         state.fetchProducts.data = [];
+      }
+   },
+};
+
+const productSlice = createSlice({
+   name: "product",
+   initialState: initialState,
+   reducer: (...params) => {
+      cartReducer(...params);
+      fetchProducts.reducer(...params);
+   },
+});
+
+export default productSlice;</code></pre>
+
+            <h3 class="text-2xl font-semibold mb-3">2. Create a Store</h3>
+            <p class="text-lg mb-4">The store brings together your slices and middleware.</p>
+            <pre><code class="language-typescript">// app/store.ts
+import { createStore } from "neuro-store";
+import productSlice from "../product/product.slice.ts";
+
+const reducers = {
+   product: productSlice.reducer,
+};
+
+type Reducers = typeof reducers;
+type State = {
+   [K in keyof Reducers]: ReturnType<Reducers[K]>;
+};
+type Middleware = [];
+
+const store = createStore<State, Reducers, Middleware>({
+   reducers: reducers,
+   middlewares: [],
+});
+
+const useAppSelector = <Selected>(selector: (state: typeof store.initialState) => Selected): Selected => {
+   return useSelector<typeof store.initialState, Selected>(selector);
+};
+
+export { useAppSelector };
+export default store;</code></pre>
+
+            <h3 class="text-2xl font-semibold mb-3">3. Provide the Store</h3>
+            <p class="text-lg mb-4">Wrap your application with the <code>StoreProvider</code> to make the store available to your components.</p>
+            <pre><code class="language-typescript">// main.tsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { StoreProvider } from "neuro-store";
+import store from "./app/store";
+import App from "./App";
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+   <StoreProvider store={store}>
+      <App />
+   </StoreProvider>
+);</code></pre>
+
+            <h3 class="text-2xl font-semibold mb-3">4. Use in Components</h3>
+            <p class="text-lg mb-4">Use the <code>useSelector</code> and <code>useDispatch</code> hooks to interact with the store in your components.</p>
+            <pre><code class="language-typescript">// product/Product.tsx
+import { useEffect } from "react";
+import { useDispatch } from "neuro-store";
+import { useAppSelector } from "../store";
+
+function Product() {
+   const { fetchProducts } = useAppSelector((state) => state.product);
+   const dispatch = useDispatch();
+
+   useEffect(() => {
+      dispatch(fetchProducts.api());
+   }, [dispatch, fetchProducts]);
+
+   if (fetchProducts.isLoading) {
+      return <div>Loading products...</div>;
+   }
+
+   if (fetchProducts.data?.length === 0) {
+      return <div>No products available</div>;
+   }
+
+   return (
+      <div>
+         {fetchProducts.data?.map((product, idx) => (
+            <div key={idx}>{product.name}</div>
+         ))}
+      </div>
+   );
+}
+
+export default Product;</code></pre>
+            <pre><code class="language-typescript">// product/Cart.tsx
+function Cart() {
+   const { cart } = useAppSelector((state) => state.product);
+   const dispatch = useDispatch();
+
+   return (
+      <div>
+         <p>Count: {cart.quantity}</p>
+         <button onClick={() => dispatch({ type: "increment" })}>Increment</button>
+         <button onClick={() => dispatch({ type: "decrement" })}>Decrement</button>
+      </div>
+   );
+}</code></pre>
+
+            <h2 class="text-3xl font-semibold mb-4">API Reference</h2>
+
+            <h3 class="text-2xl font-semibold mb-3"><code>createStore(config)</code></h3>
+            <p class="text-lg mb-4">Creates a new store.</p>
+            <ul class="list-disc list-inside mb-6 text-lg">
+                <li><code>config.reducers</code>: An object of slice reducers.</li>
+                <li><code>config.middlewares</code>: An array of middleware functions.</li>
+            </ul>
+
+            <h3 class="text-2xl font-semibold mb-3"><code>createSlice(config)</code></h3>
+            <p class="text-lg mb-4">Creates a new slice.</p>
+            <ul class="list-disc list-inside mb-6 text-lg">
+                <li><code>config.name</code>: The name of the slice.</li>
+                <li><code>config.initialState</code>: The initial state of the slice.</li>
+                <li><code>config.reducer</code>: The reducer function for the slice.</li>
+            </ul>
+
+            <h3 class="text-2xl font-semibold mb-3"><code>useSelector(selector)</code></h3>
+            <p class="text-lg mb-4">A React hook that allows you to extract data from the store state.</p>
+            <ul class="list-disc list-inside mb-6 text-lg">
+                <li><code>selector</code>: A function that takes the store state and returns the desired data.</li>
+            </ul>
+
+            <h3 class="text-2xl font-semibold mb-3"><code>useDispatch()</code></h3>
+            <p class="text-lg mb-4">A React hook that returns the store's <code>dispatch</code> function.</p>
+
+            <h3 class="text-2xl font-semibold mb-3"><code>asyncThunk(type, payloadCreator)</code></h3>
+            <p class="text-lg mb-4">A utility for creating asynchronous thunks.</p>
+            <ul class="list-disc list-inside mb-6 text-lg">
+                <li><code>type</code>: A string that will be used to generate action types.</li>
+                <li><code>payloadCreator</code>: A function that returns a promise.</li>
+            </ul>
+
+            <h2 class="text-3xl font-semibold mb-4">License</h2>
+            <p class="text-lg">ISC</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,6 +1,6 @@
 {
    "name": "neuro-store",
-   "version": "1.0.0",
+   "version": "1.0.2",
    "description": "neuro-store",
    "main": "dist/index.js",
    "module": "dist/index.es.js",
@@ -23,6 +23,14 @@
    "author": "ritesh goswami",
    "license": "ISC",
    "type": "module",
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/riteshmyhub/neuro-store.git"
+   },
+   "bugs": {
+      "url": "https://github.com/riteshmyhub/neuro-store/issues"
+   },
+   "homepage": "https://github.com/riteshmyhub/neuro-store#readme",
    "dependencies": {
       "@types/react": "^19.1.9",
       "@types/react-dom": "^19.1.7",
