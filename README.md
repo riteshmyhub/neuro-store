@@ -1,30 +1,51 @@
 # neuro-store
 
-`neuro-store` is a lightweight, Redux-inspired state management library for React applications. It provides a simple and intuitive API for creating and managing application state, with built-in support for asynchronous actions and middleware.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/riteshmyhub/neuro-store/main/dev/public/logo.png" alt="neuro-store logo" width="200" />
+</p>
 
-## Installation
+<p align="center">
+  <strong>A lightweight, Redux-inspired state management library for React applications.</strong>
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/neuro-store">
+    <img src="https://img.shields.io/npm/v/neuro-store.svg" alt="NPM Version" />
+  </a>
+  <a href="https://github.com/riteshmyhub/neuro-store/blob/main/LICENSE">
+    <img src="https://img.shields.io/npm/l/neuro-store.svg" alt="License" />
+  </a>
+  <a href="https://github.com/riteshmyhub/neuro-store/commits/main">
+    <img src="https://img.shields.io/github/last-commit/riteshmyhub/neuro-store.svg" alt="Last Commit" />
+  </a>
+</p>
+
+`neuro-store` provides a simple and intuitive API for creating and managing application state, with built-in support for asynchronous actions and middleware.
+
+## ✨ Features
+
+*   **Lightweight:** Only 2KB gzipped.
+*   **Simple API:** Easy to learn and use.
+*   **Redux-inspired:** Familiar concepts for Redux users.
+*   **Async Actions:** Built-in support for asynchronous actions with `asyncThunk`.
+*   **Middleware:** Extend the store's functionality with custom middleware.
+*   **TypeScript Support:** Written in TypeScript for a better developer experience.
+
+## 📦 Installation
 
 ```bash
 npm install neuro-store
 ```
 
-## Core Concepts
+## 🚀 Usage
 
-`neuro-store` is built around three core concepts:
-
--  **Slice:** A modular way to organize your state and reducers.
--  **Store:** The single source of truth for your application's state.
--  **Actions:** Plain JavaScript objects that describe state changes.
-
-## Usage
-
-### 1. Create a Reducer sync & async
+### 1. Create a Slice
 
 A slice is a collection of a reducer function, a name, and an initial state value.
 
 ```typescript
 // product/product.slice.ts
-import { asyncThunk, createSlice } from "neuro-store";
+import { asyncThunk, createSlice, type ActionType } from "neuro-store";
 
 const initialState = {
    fetchProducts: {
@@ -36,31 +57,34 @@ const initialState = {
    },
 };
 
-//sync reducer
-const cartReducer = (state, action) => {
+// Sync reducer
+const cartReducer = (state: typeof initialState, action: any) => {
    if (action.type === "increment") {
-      state.value += 1;
+      state.cart.quantity += 1;
    }
    if (action.type === "decrement") {
-      state.value -= 1;
+      state.cart.quantity -= 1;
    }
 };
 
-//async reducer
-const fetchProducts = {
+// Async reducer
+const fetchProductsApi = {
    api: asyncThunk("fetchProducts", async (_) => {
-      const response = await fetch(`/api/products`);
-      return response.json();
+      const res = await fetch("https://api.escuelajs.co/api/v1/products");
+      if (!res.ok) {
+         throw new Error(`HTTP error! Status: ${res.status}`);
+      }
+      return await res.json();
    }),
-   reducer(state, action) {
-      if (action.paylaod === fetchUser.pending) {
+   reducer(state: typeof initialState, action: ActionType<any>) {
+      if (action.type === fetchProductsApi.api.pending) {
          state.fetchProducts.isLoading = true;
       }
-      if (action.paylaod === fetchUser.fulfilled) {
+      if (action.type === fetchProductsApi.api.fulfilled) {
          state.fetchProducts.isLoading = false;
          state.fetchProducts.data = action.payload;
       }
-      if (action.paylaod === fetchUser.rejected) {
+      if (action.type === fetchProductsApi.api.rejected) {
          state.fetchProducts.isLoading = false;
          state.fetchProducts.data = [];
       }
@@ -72,10 +96,11 @@ const productSlice = createSlice({
    initialState: initialState,
    reducer: (...params) => {
       cartReducer(...params);
-      fetchProducts.reducer(...params);
+      fetchProductsApi.reducer(...params);
    },
 });
 
+export { fetchProductsApi };
 export default productSlice;
 ```
 
@@ -85,8 +110,8 @@ The store brings together your slices and middleware.
 
 ```typescript
 // app/store.ts
-import { createStore } from "neuro-store";
-import productSlice from "../product/product.slice.ts";
+import { createStore, useSelector } from "neuro-store";
+import productSlice from "./product/product.slice";
 
 const reducers = {
    product: productSlice.reducer,
@@ -103,7 +128,7 @@ const store = createStore<State, Reducers, Middleware>({
    middlewares: [],
 });
 
-const useAppSelector = <Selected>(selector: (state: typeof store.initialState) => Selected): Selected => {
+const useAppSelector = <Selected,>(selector: (state: typeof store.initialState) => Selected): Selected => {
    return useSelector<typeof store.initialState, Selected>(selector);
 };
 
@@ -139,25 +164,28 @@ Use the `useSelector` and `useDispatch` hooks to interact with the store in your
 import { useEffect } from "react";
 import { useDispatch } from "neuro-store";
 import { useAppSelector } from "../store";
+import { fetchProductsApi } from "./product.slice";
 
-function Product() {
+export default function Product() {
    const { fetchProducts } = useAppSelector((state) => state.product);
    const dispatch = useDispatch();
 
    useEffect(() => {
-      dispatch(fetchProducts.api());
-   }, [dispatch, fetchProducts]);
-   
+      dispatch(fetchProductsApi.api(null));
+   }, []);
+
+   if (fetchProducts.isLoading) {
+      return "isLoading...";
+   }
+
    return (
       <div>
-         {fetchProducts.data?.map((product, idx) => (
-            <div key={idx}>{product.name}</div>
+         {fetchProducts?.data?.map((product, idx) => (
+            <div key={idx}>{product?.title}</div>
          ))}
       </div>
    );
 }
-
-export default Product;
 ```
 
 ```typescript
@@ -169,51 +197,30 @@ function Cart() {
    return (
       <div>
          <p>Count: {cart.quantity}</p>
-         <button onClick={() => dispatch({ type: "increment" })}>
-            Increment
-         </button>
-         <button onClick={() => dispatch({ type: "decrement" })}>
-            Decrement
-         </button>
+         <button onClick={() => dispatch({ type: "increment" })}>Increment</button>
+         <button onClick={() => dispatch({ type: "decrement" })}>Decrement</button>
       </div>
    );
 }
 ```
 
-## API Reference
+## 📖 API Reference
 
-### `createStore(config)`
+| Function | Description |
+| --- | --- |
+| `createStore(config)` | Creates a new store. |
+| `createSlice(config)` | Creates a new slice. |
+| `useSelector(selector)` | A React hook that allows you to extract data from the store state. |
+| `useDispatch()` | A React hook that returns the store's `dispatch` function. |
+| `dispatch.withPromise(action)` | A utility that allows you to dispatch an action and receive a promise in return. |
+| `asyncThunk(type, payloadCreator)` | A utility for creating asynchronous thunks. |
 
-Creates a new store.
+## 🤝 Contributing
 
--  `config.reducers`: An object of slice reducers.
--  `config.middlewares`: An array of middleware functions.
+Contributions, issues and feature requests are welcome!
+Feel free to check [issues page](https://github.com/riteshmyhub/neuro-store/issues).
 
-### `createSlice(config)`
+## 📝 License
 
-Creates a new slice.
-
--  `config.name`: The name of the slice.
--  `config.initialState`: The initial state of the slice.
--  `config.reducer`: The reducer function for the slice.
-
-### `useSelector(selector)`
-
-A React hook that allows you to extract data from the store state.
-
--  `selector`: A function that takes the store state and returns the desired data.
-
-### `useDispatch()`
-
-A React hook that returns the store's `dispatch` function.
-
-### `asyncThunk(type, payloadCreator)`
-
-A utility for creating asynchronous thunks.
-
--  `type`: A string that will be used to generate action types.
--  `payloadCreator`: A function that returns a promise.
-
-## License
-
-ISC
+Copyright © 2023 [Ritesh Goswami](https://github.com/riteshmyhub).<br />
+This project is [ISC](https://github.com/riteshmyhub/neuro-store/blob/main/LICENSE) licensed.
