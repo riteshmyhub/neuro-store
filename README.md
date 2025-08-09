@@ -211,6 +211,43 @@ A React hook that allows you to extract data from the store state.
 
 A React hook that returns the store's `dispatch` function.
 
+### `dispatch.withPromise(action)`
+
+A utility that allows you to dispatch an action and receive a promise in return. This is particularly useful for handling asynchronous actions created with `asyncThunk`. The promise will resolve with the action's payload upon successful completion, or reject with an error if the action fails.
+
+```typescript
+// product/Product.tsx
+import { useEffect } from "react";
+import { useDispatch } from "neuro-store";
+import { useAppSelector } from "../store";
+import { fetchProductsApi } from "./product.slice";
+
+export default function Product() {
+   const { fetchProducts } = useAppSelector((state) => state.product);
+   const dispatch = useDispatch();
+
+   useEffect(() => {
+      dispatch
+         .withPromise(fetchProductsApi.api(null))
+         .then((action) => console.log("Fulfilled:", action.payload))
+         .catch((err) => console.log("Rejected:", err));
+   }, []);
+
+   if (fetchProducts.isLoading) {
+      return "isLoading...";
+   }
+   console.log(fetchProducts.data);
+
+   return (
+      <div>
+         {fetchProducts?.data?.map((product, idx) => (
+            <div key={idx}>{product?.title}</div>
+         ))}
+      </div>
+   );
+}
+```
+
 ### `asyncThunk(type, payloadCreator)`
 
 A utility for creating asynchronous thunks.
