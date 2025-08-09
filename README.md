@@ -1,7 +1,7 @@
 # neuro-store
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/riteshmyhub/neuro-store/main/dev/public/logo.svg" alt="neuro-store logo" width="200" />
+  <img src="https://raw.githubusercontent.com/riteshmyhub/neuro-store/main/dev/public/logo.png" alt="neuro-store logo" width="200" />
 </p>
 
 <p align="center">
