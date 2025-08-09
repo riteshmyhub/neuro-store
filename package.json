@@ -1,6 +1,6 @@
 {
    "name": "neuro-store",
-   "version": "1.0.4",
+   "version": "1.0.5",
    "description": "neuro-store",
    "main": "dist/index.js",
    "module": "dist/index.es.js",
