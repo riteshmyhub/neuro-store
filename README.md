@@ -1,24 +1,45 @@
 # neuro-store
 
-`neuro-store` is a lightweight, Redux-inspired state management library for React applications. It provides a simple and intuitive API for creating and managing application state, with built-in support for asynchronous actions and middleware.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/riteshmyhub/neuro-store/main/dev/public/logo.svg" alt="neuro-store logo" width="200" />
+</p>
 
-## Installation
+<p align="center">
+  <strong>A lightweight, Redux-inspired state management library for React applications.</strong>
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/neuro-store">
+    <img src="https://img.shields.io/npm/v/neuro-store.svg" alt="NPM Version" />
+  </a>
+  <a href="https://github.com/riteshmyhub/neuro-store/blob/main/LICENSE">
+    <img src="https://img.shields.io/npm/l/neuro-store.svg" alt="License" />
+  </a>
+  <a href="https://github.com/riteshmyhub/neuro-store/commits/main">
+    <img src="https://img.shields.io/github/last-commit/riteshmyhub/neuro-store.svg" alt="Last Commit" />
+  </a>
+</p>
+
+`neuro-store` provides a simple and intuitive API for creating and managing application state, with built-in support for asynchronous actions and middleware.
+
+## ✨ Features
+
+*   **Lightweight:** Only 2KB gzipped.
+*   **Simple API:** Easy to learn and use.
+*   **Redux-inspired:** Familiar concepts for Redux users.
+*   **Async Actions:** Built-in support for asynchronous actions with `asyncThunk`.
+*   **Middleware:** Extend the store's functionality with custom middleware.
+*   **TypeScript Support:** Written in TypeScript for a better developer experience.
+
+## 📦 Installation
 
 ```bash
 npm install neuro-store
 ```
 
-## Core Concepts
+## 🚀 Usage
 
-`neuro-store` is built around three core concepts:
-
--  **Slice:** A modular way to organize your state and reducers.
--  **Store:** The single source of truth for your application's state.
--  **Actions:** Plain JavaScript objects that describe state changes.
-
-## Usage
-
-### 1. Create a Reducer sync & async
+### 1. Create a Slice
 
 A slice is a collection of a reducer function, a name, and an initial state value.
 
@@ -36,7 +57,7 @@ const initialState = {
    },
 };
 
-//sync reducer
+// Sync reducer
 const cartReducer = (state: typeof initialState, action: any) => {
    if (action.type === "increment") {
       state.cart.quantity += 1;
@@ -46,7 +67,7 @@ const cartReducer = (state: typeof initialState, action: any) => {
    }
 };
 
-//async reducer
+// Async reducer
 const fetchProductsApi = {
    api: asyncThunk("fetchProducts", async (_) => {
       const res = await fetch("https://api.escuelajs.co/api/v1/products");
@@ -107,7 +128,7 @@ const store = createStore<State, Reducers, Middleware>({
    middlewares: [],
 });
 
-const useAppSelector = <Selected>(selector: (state: typeof store.initialState) => Selected): Selected => {
+const useAppSelector = <Selected,>(selector: (state: typeof store.initialState) => Selected): Selected => {
    return useSelector<typeof store.initialState, Selected>(selector);
 };
 
@@ -156,7 +177,6 @@ export default function Product() {
    if (fetchProducts.isLoading) {
       return "isLoading...";
    }
-   console.log(fetchProducts.data);
 
    return (
       <div>
@@ -184,77 +204,23 @@ function Cart() {
 }
 ```
 
-## API Reference
+## 📖 API Reference
 
-### `createStore(config)`
+| Function | Description |
+| --- | --- |
+| `createStore(config)` | Creates a new store. |
+| `createSlice(config)` | Creates a new slice. |
+| `useSelector(selector)` | A React hook that allows you to extract data from the store state. |
+| `useDispatch()` | A React hook that returns the store's `dispatch` function. |
+| `dispatch.withPromise(action)` | A utility that allows you to dispatch an action and receive a promise in return. |
+| `asyncThunk(type, payloadCreator)` | A utility for creating asynchronous thunks. |
 
-Creates a new store.
+## 🤝 Contributing
 
--  `config.reducers`: An object of slice reducers.
--  `config.middlewares`: An array of middleware functions.
+Contributions, issues and feature requests are welcome!
+Feel free to check [issues page](https://github.com/riteshmyhub/neuro-store/issues).
 
-### `createSlice(config)`
+## 📝 License
 
-Creates a new slice.
-
--  `config.name`: The name of the slice.
--  `config.initialState`: The initial state of the slice.
--  `config.reducer`: The reducer function for the slice.
-
-### `useSelector(selector)`
-
-A React hook that allows you to extract data from the store state.
-
--  `selector`: A function that takes the store state and returns the desired data.
-
-### `useDispatch()`
-
-A React hook that returns the store's `dispatch` function.
-
-### `dispatch.withPromise(action)`
-
-A utility that allows you to dispatch an action and receive a promise in return. This is particularly useful for handling asynchronous actions created with `asyncThunk`. The promise will resolve with the action's payload upon successful completion, or reject with an error if the action fails.
-
-```typescript
-// product/Product.tsx
-import { useEffect } from "react";
-import { useDispatch } from "neuro-store";
-import { useAppSelector } from "../store";
-import { fetchProductsApi } from "./product.slice";
-
-export default function Product() {
-   const { fetchProducts } = useAppSelector((state) => state.product);
-   const dispatch = useDispatch();
-
-   useEffect(() => {
-      dispatch
-         .withPromise(fetchProductsApi.api(null))
-         .then((action) => console.log("Fulfilled:", action.payload))
-         .catch((err) => console.log("Rejected:", err));
-   }, []);
-
-   if (fetchProducts.isLoading) {
-      return "isLoading...";
-   }
-   console.log(fetchProducts.data);
-
-   return (
-      <div>
-         {fetchProducts?.data?.map((product, idx) => (
-            <div key={idx}>{product?.title}</div>
-         ))}
-      </div>
-   );
-}
-```
-
-### `asyncThunk(type, payloadCreator)`
-
-A utility for creating asynchronous thunks.
-
--  `type`: A string that will be used to generate action types.
--  `payloadCreator`: A function that returns a promise.
-
-## License
-
-ISC
+Copyright © 2023 [Ritesh Goswami](https://github.com/riteshmyhub).<br />
+This project is [ISC](https://github.com/riteshmyhub/neuro-store/blob/main/LICENSE) licensed.
