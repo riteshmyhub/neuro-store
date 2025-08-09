@@ -1,6 +1,6 @@
 {
    "name": "neuro-store",
-   "version": "1.0.2",
+   "version": "1.0.3",
    "description": "neuro-store",
    "main": "dist/index.js",
    "module": "dist/index.es.js",
@@ -8,8 +8,9 @@
    "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1",
       "build": "npx rollup -c",
-      "dev": "npm run build && npm link && cd ../example && npm link neuro-store && npm run dev",
-      "clean": "rmdir /s /q dist && npm unlink neuro-store && cd ../example && npm unlink neuro-store"
+      "dev": "npm run build && npm link && cd ./dev && npm link neuro-store && npm run dev",
+      "clean": "rmdir /s /q dist && npm unlink neuro-store && cd ./dev && npm unlink neuro-store",
+      "restart": "npm run clean && npm run dev"
    },
    "keywords": [
       "react",

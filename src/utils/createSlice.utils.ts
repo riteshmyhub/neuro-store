@@ -8,6 +8,11 @@ interface CreateSliceParams<S> {
    reducer: ReducerFn<S>;
 }
 
+export type ActionType<T> = {
+   type: string;
+   payload: T;
+};
+
 interface Slice<S> {
    name: string;
    initialState: S;

@@ -24,7 +24,7 @@ A slice is a collection of a reducer function, a name, and an initial state valu
 
 ```typescript
 // product/product.slice.ts
-import { asyncThunk, createSlice } from "neuro-store";
+import { asyncThunk, createSlice, type ActionType } from "neuro-store";
 
 const initialState = {
    fetchProducts: {
@@ -37,30 +37,33 @@ const initialState = {
 };
 
 //sync reducer
-const cartReducer = (state, action) => {
+const cartReducer = (state: typeof initialState, action: any) => {
    if (action.type === "increment") {
-      state.value += 1;
+      state.cart.quantity += 1;
    }
    if (action.type === "decrement") {
-      state.value -= 1;
+      state.cart.quantity -= 1;
    }
 };
 
 //async reducer
-const fetchProducts = {
+const fetchProductsApi = {
    api: asyncThunk("fetchProducts", async (_) => {
-      const response = await fetch(`/api/products`);
-      return response.json();
+      const res = await fetch("https://api.escuelajs.co/api/v1/products");
+      if (!res.ok) {
+         throw new Error(`HTTP error! Status: ${res.status}`);
+      }
+      return await res.json();
    }),
-   reducer(state, action) {
-      if (action.paylaod === fetchUser.pending) {
+   reducer(state: typeof initialState, action: ActionType<any>) {
+      if (action.type === fetchProductsApi.api.pending) {
          state.fetchProducts.isLoading = true;
       }
-      if (action.paylaod === fetchUser.fulfilled) {
+      if (action.type === fetchProductsApi.api.fulfilled) {
          state.fetchProducts.isLoading = false;
          state.fetchProducts.data = action.payload;
       }
-      if (action.paylaod === fetchUser.rejected) {
+      if (action.type === fetchProductsApi.api.rejected) {
          state.fetchProducts.isLoading = false;
          state.fetchProducts.data = [];
       }
@@ -72,10 +75,11 @@ const productSlice = createSlice({
    initialState: initialState,
    reducer: (...params) => {
       cartReducer(...params);
-      fetchProducts.reducer(...params);
+      fetchProductsApi.reducer(...params);
    },
 });
 
+export { fetchProductsApi };
 export default productSlice;
 ```
 
@@ -85,8 +89,8 @@ The store brings together your slices and middleware.
 
 ```typescript
 // app/store.ts
-import { createStore } from "neuro-store";
-import productSlice from "../product/product.slice.ts";
+import { createStore, useSelector } from "neuro-store";
+import productSlice from "./product/product.slice";
 
 const reducers = {
    product: productSlice.reducer,
@@ -139,25 +143,29 @@ Use the `useSelector` and `useDispatch` hooks to interact with the store in your
 import { useEffect } from "react";
 import { useDispatch } from "neuro-store";
 import { useAppSelector } from "../store";
+import { fetchProductsApi } from "./product.slice";
 
-function Product() {
+export default function Product() {
    const { fetchProducts } = useAppSelector((state) => state.product);
    const dispatch = useDispatch();
 
    useEffect(() => {
-      dispatch(fetchProducts.api());
-   }, [dispatch, fetchProducts]);
-   
+      dispatch(fetchProductsApi.api(null));
+   }, []);
+
+   if (fetchProducts.isLoading) {
+      return "isLoading...";
+   }
+   console.log(fetchProducts.data);
+
    return (
       <div>
-         {fetchProducts.data?.map((product, idx) => (
-            <div key={idx}>{product.name}</div>
+         {fetchProducts?.data?.map((product, idx) => (
+            <div key={idx}>{product?.title}</div>
          ))}
       </div>
    );
 }
-
-export default Product;
 ```
 
 ```typescript
@@ -169,12 +177,8 @@ function Cart() {
    return (
       <div>
          <p>Count: {cart.quantity}</p>
-         <button onClick={() => dispatch({ type: "increment" })}>
-            Increment
-         </button>
-         <button onClick={() => dispatch({ type: "decrement" })}>
-            Decrement
-         </button>
+         <button onClick={() => dispatch({ type: "increment" })}>Increment</button>
+         <button onClick={() => dispatch({ type: "decrement" })}>Decrement</button>
       </div>
    );
 }
