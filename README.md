@@ -1,7 +1,7 @@
 # neuro-store
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/riteshmyhub/neuro-store/main/dev/public/logo.png" alt="neuro-store logo" width="200" />
+  <img src="https://raw.githubusercontent.com/riteshmyhub/neuro-store/refs/heads/master/dev/public/logo.png" alt="neuro-store logo" width="200" />
 </p>
 
 <p align="center">
@@ -24,12 +24,12 @@
 
 ## ✨ Features
 
-*   **Lightweight:** Only 2KB gzipped.
-*   **Simple API:** Easy to learn and use.
-*   **Redux-inspired:** Familiar concepts for Redux users.
-*   **Async Actions:** Built-in support for asynchronous actions with `asyncThunk`.
-*   **Middleware:** Extend the store's functionality with custom middleware.
-*   **TypeScript Support:** Written in TypeScript for a better developer experience.
+-  **Lightweight:** Only 2KB gzipped.
+-  **Simple API:** Easy to learn and use.
+-  **Redux-inspired:** Familiar concepts for Redux users.
+-  **Async Actions:** Built-in support for asynchronous actions with `asyncThunk`.
+-  **Middleware:** Extend the store's functionality with custom middleware.
+-  **TypeScript Support:** Written in TypeScript for a better developer experience.
 
 ## 📦 Installation
 
@@ -128,7 +128,7 @@ const store = createStore<State, Reducers, Middleware>({
    middlewares: [],
 });
 
-const useAppSelector = <Selected,>(selector: (state: typeof store.initialState) => Selected): Selected => {
+const useAppSelector = <Selected>(selector: (state: typeof store.initialState) => Selected): Selected => {
    return useSelector<typeof store.initialState, Selected>(selector);
 };
 
@@ -206,14 +206,14 @@ function Cart() {
 
 ## 📖 API Reference
 
-| Function | Description |
-| --- | --- |
-| `createStore(config)` | Creates a new store. |
-| `createSlice(config)` | Creates a new slice. |
-| `useSelector(selector)` | A React hook that allows you to extract data from the store state. |
-| `useDispatch()` | A React hook that returns the store's `dispatch` function. |
-| `dispatch.withPromise(action)` | A utility that allows you to dispatch an action and receive a promise in return. |
-| `asyncThunk(type, payloadCreator)` | A utility for creating asynchronous thunks. |
+| Function                           | Description                                                                      |
+| ---------------------------------- | -------------------------------------------------------------------------------- |
+| `createStore(config)`              | Creates a new store.                                                             |
+| `createSlice(config)`              | Creates a new slice.                                                             |
+| `useSelector(selector)`            | A React hook that allows you to extract data from the store state.               |
+| `useDispatch()`                    | A React hook that returns the store's `dispatch` function.                       |
+| `dispatch.withPromise(action)`     | A utility that allows you to dispatch an action and receive a promise in return. |
+| `asyncThunk(type, payloadCreator)` | A utility for creating asynchronous thunks.                                      |
 
 ## 🤝 Contributing
 
