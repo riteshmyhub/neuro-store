@@ -7,15 +7,16 @@ type StoreContextType = { state: ReturnType<typeof createStore>; dispatch: Dispa
 export const StoreContext = createContext<StoreContextType>(undefined as any);
 
 /* ---  [Middlewares] --- */
-const thunkMiddleware =
-   ({ dispatch, getState }: any) =>
-   (next: any) =>
-   (action: any) => {
-      if (typeof action === "function") {
+type GetState = () => any;
+
+export type MiddlewareType = (api: { dispatch: Dispatch<any>; getState: GetState }) => (next: Dispatch<any>) => (action: any) => any;
+
+const thunkMiddleware: MiddlewareType = ({ dispatch, getState }) => (next) => (action) => {
+     if (typeof action === "function") {
          return action(dispatch, getState);
-      }
-      return next(action);
-   };
+     }
+    return next(action);
+};
 
 /* ---  [StoreProvider] --- */
 export const StoreProvider = ({ children, store }: { children: ReactNode; store: ReturnType<typeof createStore> }) => {

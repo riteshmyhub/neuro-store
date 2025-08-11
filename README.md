@@ -104,39 +104,54 @@ export { fetchProductsApi };
 export default productSlice;
 ```
 
-### 2. Create a Store
+### 2. Create Middleware
+
+Middleware allows you to extend the store's functionality by intercepting actions before they reach the reducer.
+
+#### Basic Middleware
+
+Here's an example of a simple basic middleware:
+
+```typescript
+import type { MiddlewareType } from "neuro-store";
+
+const middleware: MiddlewareType = (params) => (next) => (action) => {
+   // params.dispatch
+   // params.getState
+   console.log(action);
+   return next(action);
+};
+export default middleware;
+```
+
+### 3. Create a Store
 
 The store brings together your slices and middleware.
 
 ```typescript
 // app/store.ts
-import { createStore, useSelector } from "neuro-store";
+import { createStore, useSelector, type MiddlewareType } from "neuro-store";
 import productSlice from "./product/product.slice";
+import middleware from "./middlewares";
 
 const reducers = {
    product: productSlice.reducer,
 };
-
 type Reducers = typeof reducers;
-type State = {
-   [K in keyof Reducers]: ReturnType<Reducers[K]>;
-};
-type Middleware = [];
+type State = { [K in keyof Reducers]: ReturnType<Reducers[K]> };
 
-const store = createStore<State, Reducers, Middleware>({
+const store = createStore<State, Reducers, MiddlewareType[]>({
    reducers: reducers,
-   middlewares: [],
+   middlewares: [middleware],
 });
 
-const useAppSelector = <Selected>(selector: (state: typeof store.initialState) => Selected): Selected => {
-   return useSelector<typeof store.initialState, Selected>(selector);
-};
+const useAppSelector = <T>(selector: (state: State) => T) => useSelector(selector);
 
 export { useAppSelector };
 export default store;
 ```
 
-### 3. Provide the Store
+### 4. Provide the Store
 
 Wrap your application with the `StoreProvider` to make the store available to your components.
 
@@ -155,7 +170,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 );
 ```
 
-### 4. Use in Components
+### 5. Use in Components
 
 Use the `useSelector` and `useDispatch` hooks to interact with the store in your components.
 
